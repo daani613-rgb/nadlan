@@ -23,7 +23,7 @@ from pathlib import Path
 # יש לאמת מול edge.boi.gov.il — ראה README_rate.md. ברירת מחדל לאימות:
 SERIES_URL = (
     "https://edge.boi.gov.il/FusionEdgeServer/sdmx/v2/data/dataflow/"
-    "BOI.STATISTICS/IR/1.0/?c[SERIES_CODE]=IRBOI&lastNObservations=1&format=csv"
+    "BOI.STATISTICS/BR/1.0/MNT_RIB_BOI_D/?lastNObservations=1&format=csv"
 )
 PRIME_SPREAD = 1.5          # פריים = ריבית בנק ישראל + 1.5%
 TIMEOUT = 30

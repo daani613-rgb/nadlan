@@ -14,13 +14,15 @@
    (תפריט: נתונים וסטטיסטיקה ← מאגר הסדרות).
 2. חפש "ריבית בנק ישראל" / "BOI interest rate". פתח את הסדרה ורשום את
    ה-dataflow ואת קוד הסדרה (SERIES_CODE).
-3. בנה URL בפורמט CSV עם התצפית האחרונה, למשל:
-   `https://edge.boi.gov.il/FusionEdgeServer/sdmx/v2/data/dataflow/BOI.STATISTICS/<DATAFLOW>/1.0/?c[SERIES_CODE]=<CODE>&lastNObservations=1&format=csv`
+3. בנה URL בפורמט CSV עם התצפית האחרונה, בצורת מפתח-בנתיב (סינון
+   לסדרה אחת — חשוב, כי הסקריפט לוקח את התצפית האחרונה בתשובה):
+   `https://edge.boi.gov.il/FusionEdgeServer/sdmx/v2/data/dataflow/BOI.STATISTICS/<DATAFLOW>/1.0/<SERIES_CODE>/?lastNObservations=1&format=csv`
+   (הסדרה הנוכחית: dataflow `BR`, סדרה `MNT_RIB_BOI_D` = ריבית בנק ישראל.)
 4. בדוק שהסקריפט מצליח לפענח אותו:
    ```
    python scripts/update_rate.py "<ה-URL-שבנית>"
    ```
-   הפלט צריך להראות ערך סביר (נכון ל-2026 — סביב **4.00%**, פריים 5.50%).
+   הפלט צריך להראות ערך סביר (נכון ל-30/06/2026 — **3.75%**, פריים 5.25%).
 5. כשה-URL נכון — עדכן את הקבוע `SERIES_URL` בראש `update_rate.py`,
    והרץ שוב בלי ארגומנט לאישור.
 

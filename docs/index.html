@@ -41,6 +41,11 @@
   textarea{width:100%;min-height:90px;border:1px solid var(--border);border-radius:8px;padding:10px;font-family:inherit;font-size:14px}
   .btn{border:none;border-radius:8px;padding:9px 16px;cursor:pointer;font-weight:bold;font-size:14px}
   .btn-g{background:#16a34a;color:#fff}.btn-b{background:var(--blue);color:#fff}.btn-r{background:#ef4444;color:#fff;padding:4px 9px}
+  .ratebar{background:#eef5fb;border:1px solid #cfe0f0;border-radius:10px;padding:8px 14px;margin-bottom:14px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;font-size:13px}
+  .ratebar .rb-main{color:#1F4E78}
+  .ratebar b{color:#15803d}
+  .ratebar .rb-sep{color:#94a3b8}
+  .ratebar .rb-note{color:#94a3b8;font-size:11px}
 </style>
 </head>
 <body>
@@ -51,6 +56,17 @@
       <p class="sub" data-i18n="sub"></p>
     </div>
     <button class="langbtn" id="langBtn" onclick="toggleLang()">English</button>
+  </div>
+
+  <div id="ratePanel" class="ratebar">
+    <span class="rb-main">
+      <span data-i18n="ref_boi"></span>: <b id="rbBoi">3.75%</b>
+      <span class="rb-sep">·</span>
+      <span data-i18n="ref_prime"></span>: <b id="rbPrime">5.25%</b>
+      <span class="rb-sep">·</span>
+      <span data-i18n="ref_updated"></span>: <span id="rbDate">—</span>
+    </span>
+    <span class="rb-note" data-i18n="ref_note"></span>
   </div>
 
   <div class="tabs">
@@ -227,6 +243,7 @@ const T={
   list_note:'השורה הירוקה = התשואה הברוטו הגבוהה ביותר. כל השדות הצהובים ניתנים לעריכה.',
   ls_desc:'מודעה',
   foot:'<b>הערות:</b> מס רכישה דירה יחידה 2026: 0% עד 1,978,745 ₪, 3.5% עד 2,347,040, 5% עד 6,055,070, 8% עד 20,183,565, 10% מעל. דירה נוספת: 8% עד 6,055,070, 10% מעל. תקרות מימון: יחידה 75%, משפר 70%, השקעה 50%. מע"מ 18%. מס שבח על השבח הריאלי 25% (30% עם מס יסף); דירה יחידה פטורה עד 5,008,000 ₪. ההכנסה הנדרשת היא אומדן הכנסה פנויה — תקרה רגולטורית 50% (40% מצרפי מ-7.2026). <b>להמחשה בלבד — לא ייעוץ פיננסי/מיסויי/משכנתאי.</b>',
+  ref_boi:'ריבית בנק ישראל', ref_prime:'פריים', ref_updated:'עודכן', ref_note:'נתון ייחוס בלבד — הקלד במחשבון את הריבית שהבנק מציע לך',
   langbtn:'English'
  },
  en:{
@@ -252,6 +269,7 @@ const T={
   list_note:'Green row = highest gross yield. All yellow fields are editable.',
   ls_desc:'Listing',
   foot:'<b>Notes:</b> Single-home purchase tax 2026: 0% to 1,978,745 ₪, 3.5% to 2,347,040, 5% to 6,055,070, 8% to 20,183,565, 10% above. Additional home: 8% to 6,055,070, 10% above. LTV caps: single 75%, replacement home 70%, investment 50%. VAT 18%. Capital gains tax on real gain 25% (30% with surtax); single residence exempt up to 5,008,000 ₪. Required income is an estimate of disposable income — regulatory cap 50% (40% aggregate from 7/2026). <b>For illustration only — not financial/tax/mortgage advice.</b>',
+  ref_boi:'Bank of Israel rate', ref_prime:'Prime', ref_updated:'Updated', ref_note:'Reference only — enter the rate your bank offers you in the calculator',
   langbtn:'עברית'
  }
 };
@@ -268,7 +286,7 @@ function applyLang(){
   $('footNote').innerHTML=T[LANG].foot;
   $('langBtn').textContent=T[LANG].langbtn;
 }
-function toggleLang(){LANG=LANG==='he'?'en':'he';applyLang();buildCmp();renderLs();calc();}
+function toggleLang(){LANG=LANG==='he'?'en':'he';applyLang();showRate(lastRate);buildCmp();renderLs();calc();}
 
 const singleBr=[[0,1978745,0],[1978745,2347040,.035],[2347040,6055070,.05],[6055070,20183565,.08],[20183565,1e12,.10]];
 const addBr=[[0,6055070,.08],[6055070,1e12,.10]];
@@ -473,7 +491,32 @@ $('parseBtn').onclick=()=>{
 $('emptyRow').onclick=()=>{lsData.push({desc:'',price:0,sqm:0,rent:0});renderLs();};
 document.querySelectorAll('#listings select,#l_ltv,#l_rate,#l_years').forEach(e=>e.addEventListener('input',calcLs));
 document.querySelectorAll('#calc input,#calc select,#sale input,#sale select').forEach(e=>e.addEventListener('input',calc));
-applyLang();calc();buildCmp();renderLs();
+const RATE_FALLBACK={boi_rate:3.75,prime:5.25,date:'2026-06-30'};
+function fmtDate(iso){
+  if(!iso)return '—';
+  try{
+    const d=new Date(iso);if(isNaN(d))return iso;
+    const s=d.toLocaleDateString(loc(),{year:'numeric',month:'short',day:'numeric'});
+    return s||iso;
+  }catch(e){return iso;}
+}
+let lastRate=RATE_FALLBACK;
+function showRate(r){
+  lastRate=r;
+  const boi=r.boi_rate,prime=(r.prime!=null?r.prime:boi+1.5);
+  $('rbBoi').textContent=boi.toFixed(2)+'%';
+  $('rbPrime').textContent=prime.toFixed(2)+'%';
+  $('rbDate').textContent=fmtDate(r.date);
+}
+function loadRate(){
+  showRate(RATE_FALLBACK);              // הצג מיד ערך אחרון ידוע
+  fetch('rate.json',{cache:'no-store'}) // ואז נסה לרענן מהקובץ שה-Action מעדכן
+    .then(res=>res.ok?res.json():null)
+    .then(r=>{if(r&&typeof r.boi_rate==='number')showRate(r);})
+    .catch(()=>{});                       // כשל (למשל פתיחה מקומית) — נשאר על הערך הידוע
+}
+
+applyLang();loadRate();calc();buildCmp();renderLs();
 </script>
 </body>
 </html>
