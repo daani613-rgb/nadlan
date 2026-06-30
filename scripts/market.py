@@ -19,6 +19,24 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from realestate.nadlan import get_market_data  # noqa: E402
 
+# תוויות דו-לשוניות (עברית · English) לפלט Excel
+SUMMARY_LABELS = {
+    "deals": ("מספר עסקאות", "Number of deals"),
+    "avg_price_per_sqm": ("מחיר ממוצע למ\"ר", "Avg price per sqm"),
+    "median_price_per_sqm": ("מחיר חציוני למ\"ר", "Median price per sqm"),
+    "avg_price": ("מחיר עסקה ממוצע", "Avg deal price"),
+    "median_price": ("מחיר עסקה חציוני", "Median deal price"),
+    "min_price": ("עסקה זולה", "Min deal"),
+    "max_price": ("עסקה יקרה", "Max deal"),
+}
+COL_HEADERS = {
+    "address": ("כתובת", "Address"), "date": ("תאריך", "Date"),
+    "price": ("מחיר (₪)", "Price (₪)"), "rooms": ("חדרים", "Rooms"),
+    "sqm": ("שטח (מ\"ר)", "Area (sqm)"), "price_per_sqm": ("מחיר למ\"ר", "Price per sqm"),
+    "type": ("סוג", "Type"), "floor": ("קומה", "Floor"),
+    "year_built": ("שנת בנייה", "Year built"),
+}
+
 
 def export_csv(rows: list[dict], path: Path) -> None:
     with open(path, "w", newline="", encoding="utf-8-sig") as f:
@@ -32,12 +50,14 @@ def export_excel(rows: list[dict], summary: dict, area: str, path: Path) -> None
     from openpyxl.styles import Font, PatternFill, Alignment
     wb = Workbook()
     su = wb.active
-    su.title = "סיכום"
+    su.title = "סיכום · Summary"
     su.sheet_view.rightToLeft = True
-    su["A1"] = f"נתוני שוק — {area}"
+    su["A1"] = f"נתוני שוק · Market data — {area}"
     su["A1"].font = Font(bold=True, size=14, color="1F4E78")
-    su["A2"] = f"נמשך בתאריך {datetime.date.today():%d/%m/%Y} ממאגר נדל\"ן הממשלתי"
+    su["A2"] = (f"נמשך בתאריך {datetime.date.today():%d/%m/%Y} ממאגר נדל\"ן הממשלתי · "
+                f"Pulled from the government real-estate database")
     su["A2"].font = Font(italic=True, size=10, color="808080")
+    wrap = Alignment(wrap_text=True, vertical="center")
     labels = {
         "deals": "מספר עסקאות", "avg_price_per_sqm": "מחיר ממוצע למ\"ר",
         "median_price_per_sqm": "מחיר חציוני למ\"ר", "avg_price": "מחיר עסקה ממוצע",
@@ -45,29 +65,32 @@ def export_excel(rows: list[dict], summary: dict, area: str, path: Path) -> None
     }
     r = 4
     for k, v in summary.items():
-        su[f"A{r}"] = labels.get(k, k)
+        he, en = SUMMARY_LABELS.get(k, (k, k))
+        su[f"A{r}"] = f"{he}\n{en}"
         su[f"A{r}"].font = Font(bold=True)
+        su[f"A{r}"].alignment = wrap
         su[f"B{r}"] = v
         su[f"B{r}"].number_format = "#,##0"
         su[f"B{r}"].fill = PatternFill("solid", fgColor="DDEBF7")
         r += 1
-    su.column_dimensions["A"].width = 26
+    su.column_dimensions["A"].width = 30
     su.column_dimensions["B"].width = 16
 
-    dt = wb.create_sheet("עסקאות")
+    dt = wb.create_sheet("עסקאות · Deals")
     dt.sheet_view.rightToLeft = True
     if rows:
         cols = list(rows[0].keys())
         for j, c in enumerate(cols, 1):
-            cell = dt.cell(row=1, column=j, value=c)
+            he, en = COL_HEADERS.get(c, (c, c))
+            cell = dt.cell(row=1, column=j, value=f"{he}\n{en}")
             cell.font = Font(bold=True, color="FFFFFF")
             cell.fill = PatternFill("solid", fgColor="1F4E78")
-            cell.alignment = Alignment(horizontal="center")
+            cell.alignment = Alignment(horizontal="center", wrap_text=True, vertical="center")
         for i, row in enumerate(rows, 2):
             for j, c in enumerate(cols, 1):
                 dt.cell(row=i, column=j, value=row[c])
         for col in "ABCDEFGHI":
-            dt.column_dimensions[col].width = 14
+            dt.column_dimensions[col].width = 15
     wb.save(path)
 
 
@@ -78,26 +101,28 @@ def main(argv=None) -> int:
     ap.add_argument("--out", default=".", help="תיקיית פלט")
     args = ap.parse_args(argv)
 
-    print(f'מחפש עסקאות עבור "{args.area}" ...')
+    print(f'מחפש עסקאות עבור "{args.area}" ... · Searching deals for "{args.area}" ...')
     try:
         rows, summary = get_market_data(args.area, args.pages)
     except Exception as e:  # noqa: BLE001
-        print(f"שגיאה: {e}", file=sys.stderr)
+        print(f"שגיאה · Error: {e}", file=sys.stderr)
         return 1
     if not rows:
-        print("לא נמצאו עסקאות.", file=sys.stderr)
+        print("לא נמצאו עסקאות. · No deals found.", file=sys.stderr)
         return 1
 
-    print(f"נמצאו {summary['deals']} עסקאות.")
+    print(f"נמצאו {summary['deals']} עסקאות. · Found {summary['deals']} deals.")
     for k, v in summary.items():
-        print(f"  {k}: {v:,}" if isinstance(v, (int, float)) else f"  {k}: {v}")
+        he, en = SUMMARY_LABELS.get(k, (k, k))
+        label = f"{he} · {en}"
+        print(f"  {label}: {v:,}" if isinstance(v, (int, float)) else f"  {label}: {v}")
 
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     stem = args.area.replace(" ", "_")
     export_csv(rows, out / f"deals_{stem}.csv")
     export_excel(rows, summary, args.area, out / f"market_{stem}.xlsx")
-    print(f"נשמר: {out / f'market_{stem}.xlsx'}")
+    print(f"נשמר · Saved: {out / f'market_{stem}.xlsx'}")
     return 0
 
 
