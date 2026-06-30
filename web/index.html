@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מחשבון השקעה בנדל"ן 2026</title>
+<style>
+  :root{--blue:#1F4E78;--lblue:#DDEBF7;--green:#E2EFDA;--yellow:#FFF2CC;--gray:#808080;--border:#cbd5e1}
+  *{box-sizing:border-box}
+  body{font-family:Arial,"Segoe UI",sans-serif;background:#f1f5f9;margin:0;padding:16px;color:#1e293b}
+  .wrap{max-width:980px;margin:0 auto}
+  h1{color:var(--blue);font-size:22px;margin:0 0 4px}
+  .sub{color:var(--gray);font-size:13px;margin:0 0 14px}
+  .tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+  .tab{padding:9px 18px;border-radius:9px;background:#e2e8f0;cursor:pointer;font-weight:bold;font-size:14px;border:none}
+  .tab.active{background:var(--blue);color:#fff}
+  .panel{display:none}.panel.active{display:block}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:680px){.grid{grid-template-columns:1fr}}
+  .card{background:#fff;border-radius:12px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:16px}
+  .card h2{font-size:15px;color:#fff;background:var(--blue);margin:-18px -18px 14px;padding:12px 18px;border-radius:12px 12px 0 0}
+  .row{display:flex;justify-content:space-between;align-items:center;margin:9px 0;gap:10px}
+  .row label{font-size:14px;flex:1}
+  .row input,.row select{width:148px;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:14px;text-align:left;background:var(--yellow);color:#0000FF;font-weight:bold}
+  .out .row{border-bottom:1px dashed #e2e8f0;padding-bottom:7px}
+  .out .v{font-weight:bold;min-width:120px;text-align:left}
+  .key{background:var(--lblue);margin:6px -8px;padding:7px 8px;border-radius:8px}
+  .key .v{color:var(--blue)}
+  .gn{background:var(--green)}
+  .pos{color:#15803d}.neg{color:#b91c1c}
+  .note{font-size:11px;color:var(--gray);margin-top:14px;line-height:1.6}
+  .big{font-size:18px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{border:1px solid var(--border);padding:7px;text-align:center}
+  th{background:var(--blue);color:#fff}
+  td.lab{text-align:right;font-weight:bold;background:#eef2f7}
+  td input,td select{width:100%;border:1px solid var(--border);border-radius:6px;padding:6px;background:var(--yellow);color:#00f;font-weight:bold;text-align:center}
+  textarea{width:100%;min-height:90px;border:1px solid var(--border);border-radius:8px;padding:10px;font-family:inherit;font-size:14px}
+  .btn{border:none;border-radius:8px;padding:9px 16px;cursor:pointer;font-weight:bold;font-size:14px}
+  .btn-g{background:#16a34a;color:#fff}.btn-b{background:var(--blue);color:#fff}.btn-r{background:#ef4444;color:#fff;padding:4px 9px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>מחשבון השקעה ורכישת דירה — 2026</h1>
+  <p class="sub">מדרגות מס 2026 (קפואות עד 2028) ותקרות מימון בנק ישראל. שדות צהובים = קלט.</p>
+
+  <div class="tabs">
+    <button class="tab active" data-t="calc">מחשבון</button>
+    <button class="tab" data-t="sale">תחזית ומכירה</button>
+    <button class="tab" data-t="cmp">השוואה</button>
+    <button class="tab" data-t="listings">מודעות ודירוג</button>
+  </div>
+
+  <!-- CALC -->
+  <div class="panel active" id="calc">
+  <div class="grid">
+    <div class="card">
+      <h2>נתוני קלט</h2>
+      <div class="row"><label>מחיר הדירה (₪)</label><input id="price" type="number" value="2000000"></div>
+      <div class="row"><label>סוג רכישה</label><select id="type"><option value="single">דירה יחידה / ראשונה</option><option value="improve">משפר דיור</option><option value="invest">דירה להשקעה / נוספת</option></select></div>
+      <div class="row"><label>אחוז מימון רצוי (%)</label><input id="ltv" type="number" value="75"></div>
+      <div class="row"><label>תקופת משכנתא (שנים)</label><input id="years" type="number" value="25"></div>
+      <div class="row"><label>ריבית שנתית (%)</label><input id="rate" type="number" value="4.8" step="0.1"></div>
+      <div class="row"><label>שכר דירה חודשי צפוי (₪)</label><input id="rent" type="number" value="6000"></div>
+      <div class="row"><label>עלות תיווך (%)</label><input id="broker" type="number" value="2" step="0.1"></div>
+      <div class="row"><label>שכ"ט עו"ד (%)</label><input id="lawyer" type="number" value="0.5" step="0.1"></div>
+      <div class="row"><label>עלויות נוספות (₪)</label><input id="extra" type="number" value="0"></div>
+      <div class="row"><label>מע"מ על שירותים (%)</label><input id="vat" type="number" value="18"></div>
+      <div class="row"><label>יחס החזר מקס' (%)</label><input id="ratio" type="number" value="33"></div>
+      <hr style="border:none;border-top:1px solid #e2e8f0;margin:10px 0">
+      <div class="row"><label>ארנונה חודשית (₪)</label><input id="arnona" type="number" value="0"></div>
+      <div class="row"><label>ועד בית חודשי (₪)</label><input id="vaad" type="number" value="0"></div>
+      <div class="row"><label>ביטוח חודשי (מבנה+חיים) ₪</label><input id="insurance" type="number" value="0"></div>
+      <div class="row"><label>רזרבת תחזוקה (% משכ"ד)</label><input id="maint" type="number" value="5" step="0.5"></div>
+      <div class="row"><label>דמי ניהול (% משכ"ד)</label><input id="mgmt" type="number" value="0" step="0.5"></div>
+      <div class="row"><label>אי-אכלוס (% בשנה)</label><input id="vacancy" type="number" value="8.3" step="0.1"></div>
+      <div class="row"><label>מסלול מס שכירות</label><select id="rtrack"><option value="auto">הזול ביותר</option><option value="exempt">פטור</option><option value="flat">10%</option><option value="marginal">מדרגות שולי</option></select></div>
+      <div class="row"><label>מדרגת מס שולי (%)</label><input id="marg" type="number" value="31"></div>
+    </div>
+    <div class="card out">
+      <h2>תוצאות</h2>
+      <div class="row key"><label>מס רכישה</label><span class="v" id="o_tax"></span></div>
+      <div class="row"><label>דמי תיווך (כולל מע"מ)</label><span class="v" id="o_broker"></span></div>
+      <div class="row"><label>שכ"ט עו"ד (כולל מע"מ)</label><span class="v" id="o_lawyer"></span></div>
+      <div class="row key"><label>סך עלויות נלוות</label><span class="v" id="o_closing"></span></div>
+      <div class="row"><label>תקרת מימון</label><span class="v" id="o_cap"></span></div>
+      <div class="row"><label>סכום המשכנתא</label><span class="v" id="o_mort"></span></div>
+      <div class="row key"><label>הון עצמי נדרש</label><span class="v big" id="o_equity"></span></div>
+      <div class="row key"><label>החזר חודשי</label><span class="v big" id="o_pmt"></span></div>
+      <div class="row"><label>הכנסה פנויה נדרשת (אומדן)</label><span class="v" id="o_income"></span></div>
+      <div class="row"><label>סך ריבית לאורך התקופה</label><span class="v" id="o_interest"></span></div>
+      <div class="row key"><label>תשואה ברוטו (על המחיר)</label><span class="v" id="o_yield"></span></div>
+      <div class="row"><label>תשואה ברוטו (על העלות)</label><span class="v" id="o_yield2"></span></div>
+      <div class="row key"><label>תזרים חודשי נטו</label><span class="v big" id="o_cf"></span></div>
+      <div class="row key"><label>תשואה על ההון (Cash-on-Cash)</label><span class="v" id="o_coc"></span></div>
+      <hr style="border:none;border-top:1px solid #e2e8f0;margin:10px 0">
+      <div class="row"><label>הוצאות שוטפות (שנתי)</label><span class="v" id="o_exp"></span></div>
+      <div class="row"><label>מס שכירות (שנתי)</label><span class="v" id="o_rtax"></span></div>
+      <div class="row gn"><label>NOI — הכנסה תפעולית נטו</label><span class="v" id="o_noi"></span></div>
+      <div class="row gn"><label>Cap Rate</label><span class="v" id="o_cap2"></span></div>
+      <div class="row gn"><label>תשואה נטו (אחרי הוצאות ומס)</label><span class="v big" id="o_nety"></span></div>
+      <div class="row gn"><label>תזרים חודשי נטו (אמיתי)</label><span class="v big" id="o_ncf"></span></div>
+      <div class="row gn"><label>תשואה נטו על ההון</label><span class="v" id="o_ncoc"></span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>תמהיל משכנתא (אופציונלי)</h2>
+    <p class="note" style="margin-top:0">חלק את המשכנתא למסלולים. אם סך החלקים &gt; 0, ההחזר החודשי במחשבון יחושב לפי התמהיל. השאר באפס כדי להתעלם.</p>
+    <table id="mixTable">
+      <thead><tr><th>מסלול</th><th>חלק (%)</th><th>ריבית (%)</th><th>שנים</th><th>החזר</th></tr></thead>
+      <tbody>
+        <tr><td class="lab">פריים</td><td><input type="number" id="mx0s" value="0"></td><td><input type="number" id="mx0r" value="5.5" step="0.1"></td><td><input type="number" id="mx0y" value="25"></td><td id="mx0p">—</td></tr>
+        <tr><td class="lab">קבועה לא צמודה (קל"צ)</td><td><input type="number" id="mx1s" value="0"></td><td><input type="number" id="mx1r" value="4.5" step="0.1"></td><td><input type="number" id="mx1y" value="25"></td><td id="mx1p">—</td></tr>
+        <tr><td class="lab">צמודת מדד</td><td><input type="number" id="mx2s" value="0"></td><td><input type="number" id="mx2r" value="3.2" step="0.1"></td><td><input type="number" id="mx2y" value="25"></td><td id="mx2p">—</td></tr>
+      </tbody>
+    </table>
+    <div class="row" style="margin-top:8px"><label><b>החזר כולל לפי תמהיל</b></label><span class="v big" id="mixTotal">—</span></div>
+    <div class="row"><label>ריבית משוקללת</label><span class="v" id="mixRate">—</span></div>
+    <div id="mixWarn" class="note" style="color:#b91c1c;font-weight:bold"></div>
+  </div>
+  </div>
+
+  <!-- SALE -->
+  <div class="panel" id="sale">
+  <div class="grid">
+    <div class="card">
+      <h2>הנחות מכירה</h2>
+      <div class="row"><label>גידול שכר דירה שנתי (%)</label><input id="rentGrow" type="number" value="3" step="0.1"></div>
+      <div class="row"><label>עליית ערך הנכס שנתית (%)</label><input id="appr" type="number" value="3.5" step="0.1"></div>
+      <div class="row"><label>שנת מכירה (שנים מחזיקים)</label><input id="holdY" type="number" value="10"></div>
+      <div class="row"><label>עלות מכירה (תיווך וכד') %</label><input id="sellCost" type="number" value="2" step="0.1"></div>
+      <div class="row"><label>פטור ממס שבח?</label><select id="exempt"><option value="no">לא (השקעה)</option><option value="yes">כן (דירה יחידה זכאית)</option></select></div>
+      <div class="row"><label>אינפלציה שנתית (% להתאמת שבח ריאלי)</label><input id="infl" type="number" value="2.5" step="0.1"></div>
+      <div class="row"><label>בעל הכנסה גבוהה? (מס יסף 5%)</label><select id="hinc"><option value="no">לא</option><option value="yes">כן</option></select></div>
+      <div class="row"><label>תשואה חלופית שנתית (%)</label><input id="altRet" type="number" value="4" step="0.1"></div>
+      <p class="note">מבוסס על נתוני לשונית "מחשבון". מס שבח ~25% מהרווח (מפושט). דירת מגורים יחידה עשויה להיות פטורה בתנאים.</p>
+    </div>
+    <div class="card out">
+      <h2>סיכום מכירה</h2>
+      <div class="row"><label>מחיר מכירה צפוי</label><span class="v" id="s_price"></span></div>
+      <div class="row"><label>יתרת משכנתא בעת המכירה</label><span class="v" id="s_mort"></span></div>
+      <div class="row"><label>עלות מכירה</label><span class="v" id="s_cost"></span></div>
+      <div class="row"><label>רווח גולמי</label><span class="v" id="s_gain"></span></div>
+      <div class="row"><label>סכום אינפלציוני (פטור)</label><span class="v" id="s_infl"></span></div>
+      <div class="row"><label>שבח ריאלי (חייב)</label><span class="v" id="s_real"></span></div>
+      <div class="row key"><label>מס שבח (על שבח ריאלי)</label><span class="v" id="s_tax"></span></div>
+      <div class="row key"><label>נטו ממכירה</label><span class="v big" id="s_net"></span></div>
+      <div class="row"><label>תזרים שכירות מצטבר</label><span class="v" id="s_cum"></span></div>
+      <div class="row"><label>הון עצמי שהושקע</label><span class="v" id="s_eq"></span></div>
+      <div class="row gn"><label>רווח כולל</label><span class="v big" id="s_profit"></span></div>
+      <div class="row gn"><label>החזר כולל על ההשקעה</label><span class="v" id="s_roi"></span></div>
+      <div class="row gn"><label>תשואה שנתית ממוצעת</label><span class="v" id="s_annual"></span></div>
+      <hr style="border:none;border-top:1px solid #e2e8f0;margin:8px 0">
+      <div class="row"><label>ערך ההון בחלופה (אותו אופק)</label><span class="v" id="s_alt"></span></div>
+      <div class="row key"><label>יתרון הנדל"ן על החלופה</label><span class="v big" id="s_adv"></span></div>
+    </div>
+  </div>
+  </div>
+
+  <!-- COMPARE -->
+  <div class="panel" id="cmp">
+    <div class="card">
+      <h2>השוואה בין דירות</h2>
+      <table id="cmpTable"><tbody></tbody></table>
+    </div>
+  </div>
+
+  <!-- LISTINGS -->
+  <div class="panel" id="listings">
+    <div class="card">
+      <h2>הדבקה חכמה</h2>
+      <p class="note" style="margin-top:0">העתק טקסט של מודעה (יד2 / מדלן / כל מקור) והדבק כאן. המנוע יחלץ אוטומטית מחיר, חדרים, שטח וקומה ויוסיף שורה לטבלה למטה. <b>העתקה ידנית של מודעה שאתה גולש בה מותרת</b> — בניגוד למשיכה אוטומטית.</p>
+      <textarea id="pasteBox" placeholder="לדוגמה: דירה למכירה ברמת גן, 4 חדרים, 95 מ&quot;ר, קומה 3, מחיר 2,650,000 ₪"></textarea>
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-g" id="parseBtn">חלץ והוסף לטבלה</button>
+        <button class="btn btn-b" id="emptyRow">+ שורה ריקה</button>
+        <span id="parseMsg" class="note" style="align-self:center"></span>
+      </div>
+    </div>
+    <div class="card">
+      <h2>טבלת מודעות ודירוג</h2>
+      <div class="grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="row"><label>סוג</label><select id="l_type"><option value="single">יחידה</option><option value="improve">משפר</option><option value="invest" selected>השקעה</option></select></div>
+        <div class="row"><label>מימון %</label><input id="l_ltv" type="number" value="50"></div>
+        <div class="row"><label>ריבית %</label><input id="l_rate" type="number" value="4.8" step="0.1"></div>
+        <div class="row"><label>שנים</label><input id="l_years" type="number" value="25"></div>
+      </div>
+      <table id="lsTable" style="margin-top:10px">
+        <thead><tr><th>תיאור</th><th>מחיר</th><th>מ"ר</th><th>שכ"ד</th><th>מחיר/מ"ר</th><th>מס רכישה</th><th>הון עצמי</th><th>החזר</th><th>תזרים</th><th>תשואה</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <p class="note">השורה הירוקה = התשואה הברוטו הגבוהה ביותר. כל השדות הצהובים ניתנים לעריכה ידנית.</p>
+    </div>
+  </div>
+
+  <p class="note">
+    <b>הערות:</b> מס רכישה דירה יחידה 2026: 0% עד 1,978,745 ₪, 3.5% עד 2,347,040, 5% עד 6,055,070, 8% עד 20,183,565, 10% מעל. דירה נוספת: 8% עד 6,055,070, 10% מעל. תקרות מימון: יחידה 75%, משפר 70%, השקעה 50%. מע"מ 18%. <b>מס שבח</b> מחושב על השבח ה<b>ריאלי</b> (אחרי ניכוי אינפלציה) בשיעור 25% (30% עם מס יסף); דירה יחידה פטורה עד תקרת 5,008,000 ₪. ההכנסה הנדרשת היא <b>אומדן</b> להכנסה פנויה — התקרה הרגולטורית 50% (40% מצרפי מ-7.2026), והבנקים מאשרים בפועל בטווח 30%-35%. למשיכת עסקאות שנמכרו לפי אזור — סקריפט nadlan_engine.py. <b>להמחשה בלבד — לא ייעוץ פיננסי/מיסויי/משכנתאי.</b>
+  </p>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const fmt=n=>isFinite(n)&&n!==null?Math.round(n).toLocaleString('he-IL')+' ₪':'—';
+const pct=n=>isFinite(n)?(n*100).toFixed(1)+'%':'—';
+const singleBr=[[0,1978745,0],[1978745,2347040,.035],[2347040,6055070,.05],[6055070,20183565,.08],[20183565,1e12,.10]];
+const addBr=[[0,6055070,.08],[6055070,1e12,.10]];
+const caps={single:.75,improve:.70,invest:.50};
+const SHV=0.25, VAT=0.18;
+const CEIL_EXEMPT=5008000, VAR_CAP=2/3;
+function tax(p,br){let t=0;for(const[a,b,r]of br)t+=Math.max(0,Math.min(p,b)-a)*r;return t;}
+function pmt(rate,n,pv){const i=rate/12;return i===0?pv/n:pv*i/(1-Math.pow(1+i,-n));}
+function balanceAfter(pv,annualRate,termY,yearsPaid){
+  const i=annualRate/12,m=Math.min(yearsPaid*12,termY*12);
+  if(yearsPaid>=termY)return 0;
+  if(i===0)return Math.max(0,pv-pmt(annualRate,termY*12,pv)*m);
+  const p=pmt(annualRate,termY*12,pv);
+  return Math.max(0,pv*Math.pow(1+i,m)-p*((Math.pow(1+i,m)-1)/i));
+}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); $(b.dataset.t).classList.add('active');
+});
+
+const CEIL=5654;
+function rentalTax(rent,track,marg,expenses,buildingVal){
+  const annual=rent*12;
+  let exTaxable;
+  if(rent<=CEIL)exTaxable=0;else if(rent>=2*CEIL)exTaxable=annual;else exTaxable=(rent-(2*CEIL-rent))*12;
+  const exempt=exTaxable*marg, flat=annual*0.10;
+  const dep=buildingVal*0.02, marginal=Math.max(0,annual-expenses-dep)*marg;
+  const opts={exempt,flat,marginal};
+  const chosen=track==='auto'?Object.keys(opts).reduce((a,b)=>opts[a]<opts[b]?a:b):track;
+  return{...opts,chosen,tax:opts[chosen]};
+}
+function mortgageMix(total){
+  let shares=0,monthly=0,blended=0,any=false,varShare=0;
+  for(let i=0;i<3;i++){const s=(+$(`mx${i}s`).value||0)/100;shares+=s;if(s>0)any=true;}
+  if(!any||shares<=0)return null;
+  for(let i=0;i<3;i++){
+    const s=(+$(`mx${i}s`).value||0)/100/shares,r=(+$(`mx${i}r`).value||0)/100,y=+$(`mx${i}y`).value||0;
+    const p=pmt(r,y*12,total*s);monthly+=p;blended+=r*s;
+    if(i===0)varShare=s; // פריים = ריבית משתנה
+    $(`mx${i}p`).textContent=fmt(p);
+  }
+  const warn=varShare>VAR_CAP+1e-9?`⚠️ חלק הפריים (${Math.round(varShare*100)}%) חורג ממגבלת בנק ישראל — ריבית משתנה עד 66%.`:'';
+  return{monthly,blended,varShare,warn};
+}
+function model(){
+  const price=+$('price').value||0,type=$('type').value;
+  const ltvWant=(+$('ltv').value||0)/100,years=+$('years').value||0,rate=(+$('rate').value||0)/100;
+  const rent=+$('rent').value||0,vat=(+$('vat').value||0)/100,ratio=(+$('ratio').value||0)/100;
+  const t=type==='invest'?tax(price,addBr):tax(price,singleBr);
+  const brokerC=price*((+$('broker').value||0)/100)*(1+vat),lawyerC=price*((+$('lawyer').value||0)/100)*(1+vat);
+  const extra=+$('extra').value||0,closing=t+brokerC+lawyerC+extra;
+  const cap=caps[type],ltv=Math.min(ltvWant,cap),mort=price*ltv;
+  const equity=price-mort+closing;
+  const mix=mortgageMix(mort);
+  const monthly=mix?mix.monthly:(mort>0?pmt(rate,years*12,mort):0);
+  return{price,type,years,rate,rent,ratio,t,brokerC,lawyerC,extra,closing,cap,ltv,ltvWant,mort,equity,monthly,mix,totalCost:price+closing};
+}
+function calc(){
+  const m=model();
+  $('o_tax').textContent=fmt(m.t);$('o_broker').textContent=fmt(m.brokerC);$('o_lawyer').textContent=fmt(m.lawyerC);
+  $('o_closing').textContent=fmt(m.closing);$('o_cap').textContent=pct(m.cap)+(m.ltvWant>m.cap?' (הוגבל)':'');
+  $('o_mort').textContent=fmt(m.mort);$('o_equity').textContent=fmt(m.equity);$('o_pmt').textContent=fmt(m.monthly);
+  $('o_income').textContent=fmt(m.ratio>0?m.monthly/m.ratio:NaN);
+  $('o_interest').textContent=fmt(m.monthly*m.years*12-m.mort);
+  $('o_yield').textContent=m.price>0?pct(m.rent*12/m.price):'—';
+  $('o_yield2').textContent=m.totalCost>0?pct(m.rent*12/m.totalCost):'—';
+  const cf=m.rent-m.monthly,cfE=$('o_cf');cfE.textContent=fmt(cf);cfE.className='v big '+(cf>=0?'pos':'neg');
+  const coc=m.equity>0?cf*12/m.equity:NaN,cE=$('o_coc');cE.textContent=pct(coc);cE.className='v '+(coc>=0?'pos':'neg');
+  // net metrics
+  const annualRent=m.rent*12,vacancy=(+$('vacancy').value||0)/100;
+  const recurring=((+$('arnona').value||0)+(+$('vaad').value||0)+(+$('insurance').value||0))*12+m.rent*(((+$('maint').value||0)+(+$('mgmt').value||0))/100)*12;
+  const rtax=rentalTax(m.rent,$('rtrack').value,(+$('marg').value||0)/100,recurring,m.price*0.7);
+  const noi=annualRent*(1-vacancy)-recurring,netAnnual=noi-rtax.tax;
+  const trackHe={exempt:'פטור',flat:'10%',marginal:'שולי'}[rtax.chosen]||rtax.chosen;
+  $('o_exp').textContent=fmt(recurring);$('o_rtax').textContent=fmt(rtax.tax)+' ('+trackHe+')';
+  $('o_noi').textContent=fmt(noi);$('o_cap2').textContent=m.price>0?pct(noi/m.price):'—';
+  $('o_nety').textContent=m.totalCost>0?pct(netAnnual/m.totalCost):'—';
+  const ncf=(netAnnual-m.monthly*12)/12,nE=$('o_ncf');nE.textContent=fmt(ncf);nE.className='v big '+(ncf>=0?'pos':'neg');
+  $('o_ncoc').textContent=m.equity>0?pct((netAnnual-m.monthly*12)/m.equity):'—';
+  if(m.mix){$('mixTotal').textContent=fmt(m.mix.monthly);$('mixRate').textContent=pct(m.mix.blended);$('mixWarn').textContent=m.mix.warn||'';}
+  else{$('mixTotal').textContent='—';$('mixRate').textContent='—';$('mixWarn').textContent='';['mx0p','mx1p','mx2p'].forEach(x=>$(x).textContent='—');}
+  sale();
+}
+function sale(){
+  const m=model();
+  const g=(+$('rentGrow').value||0)/100,ap=(+$('appr').value||0)/100;
+  const hold=Math.max(1,+$('holdY').value||1),sc=(+$('sellCost').value||0)/100,exempt=$('exempt').value==='yes';
+  const infl=(+$('infl').value||0)/100,hinc=$('hinc').value==='yes';
+  const salePrice=m.price*Math.pow(1+ap,hold),remMort=balanceAfter(m.mort,m.rate,m.years,hold);
+  const sellCost=salePrice*sc,gain=salePrice-m.totalCost-sellCost;
+  const inflAmount=m.totalCost*(Math.pow(1+infl,hold)-1);
+  const realGain=Math.max(0,gain-inflAmount);
+  let shv=0;
+  if(realGain>0){
+    let frac=1;
+    if(exempt){frac=salePrice>CEIL_EXEMPT?(salePrice-CEIL_EXEMPT)/salePrice:0;}
+    const taxable=realGain*frac;
+    shv=taxable*(hinc?0.30:0.25);
+  }
+  const net=salePrice-sellCost-remMort-shv;
+  let cum=0;for(let y=1;y<=hold;y++){cum+=m.rent*12*Math.pow(1+g,y-1)-(y<=m.years?m.monthly*12:0);}
+  const profit=net+cum-m.equity,roi=m.equity>0?profit/m.equity:NaN;
+  const annual=(m.equity>0&&hold>0)?Math.pow(1+roi,1/hold)-1:NaN;
+  $('s_price').textContent=fmt(salePrice);$('s_mort').textContent=fmt(remMort);$('s_cost').textContent=fmt(sellCost);
+  $('s_gain').textContent=fmt(gain);$('s_infl').textContent=fmt(inflAmount);$('s_real').textContent=fmt(realGain);
+  $('s_tax').textContent=fmt(shv);$('s_net').textContent=fmt(net);
+  $('s_cum').textContent=fmt(cum);$('s_eq').textContent=fmt(m.equity);
+  const pE=$('s_profit');pE.textContent=fmt(profit);pE.className='v big '+(profit>=0?'pos':'neg');
+  $('s_roi').textContent=pct(roi);$('s_annual').textContent=pct(annual);
+  const alt=(+$('altRet').value||0)/100,altFuture=m.equity*Math.pow(1+alt,hold),altProfit=altFuture-m.equity;
+  $('s_alt').textContent=fmt(altFuture);
+  const adv=profit-altProfit,aE=$('s_adv');aE.textContent=fmt(adv);aE.className='v big '+(adv>=0?'pos':'neg');
+}
+
+// COMPARE
+const cmpRows=[
+  {k:'price',lab:'מחיר הדירה (₪)',v:[1800000,2200000,2600000]},
+  {k:'type',lab:'סוג רכישה',v:['invest','invest','invest'],sel:true},
+  {k:'ltv',lab:'אחוז מימון רצוי (%)',v:[50,50,50]},
+  {k:'years',lab:'תקופה (שנים)',v:[25,25,25]},
+  {k:'rate',lab:'ריבית (%)',v:[4.8,4.8,4.8]},
+  {k:'rent',lab:'שכר דירה חודשי (₪)',v:[6000,7000,8200]},
+];
+function buildCmp(){
+  const tb=$('cmpTable').querySelector('tbody');
+  tb.innerHTML='<tr><th>פרמטר</th><th>דירה 1</th><th>דירה 2</th><th>דירה 3</th></tr>';
+  cmpRows.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="lab">${r.lab}</td>`+[0,1,2].map(i=>{
+      if(r.sel)return `<td><select data-k="${r.k}" data-i="${i}"><option value="single">יחידה</option><option value="improve">משפר</option><option value="invest" selected>השקעה</option></select></td>`;
+      return `<td><input type="number" data-k="${r.k}" data-i="${i}" value="${r.v[i]}"></td>`;
+    }).join('');
+    tb.appendChild(tr);
+  });
+  [['מס רכישה','tax'],['עלויות נלוות','closing'],['הון עצמי נדרש','equity'],['החזר חודשי','monthly'],['תשואה ברוטו','yield'],['תזרים חודשי נטו','cf'],['Cash-on-Cash','coc']].forEach(([lab,k])=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="lab">${lab}</td><td id="c0_${k}"></td><td id="c1_${k}"></td><td id="c2_${k}"></td>`;
+    tb.appendChild(tr);
+  });
+  tb.querySelectorAll('input,select').forEach(e=>e.addEventListener('input',calcCmp));
+  calcCmp();
+}
+function calcCmp(){
+  for(let i=0;i<3;i++){
+    const get=k=>{const el=document.querySelector(`[data-k="${k}"][data-i="${i}"]`);return el?el.value:null;};
+    const price=+get('price')||0,type=get('type'),ltvW=(+get('ltv')||0)/100,years=+get('years')||0,rate=(+get('rate')||0)/100,rent=+get('rent')||0;
+    const t=type==='invest'?tax(price,addBr):tax(price,singleBr);
+    const closing=t+price*0.02*(1+VAT)+price*0.005*(1+VAT);
+    const cap=caps[type],ltv=Math.min(ltvW,cap),mort=price*ltv,equity=price-mort+closing;
+    const monthly=mort>0?pmt(rate,years*12,mort):0,cf=rent-monthly;
+    const vals={tax:fmt(t),closing:fmt(closing),equity:fmt(equity),monthly:fmt(monthly),yield:price>0?pct(rent*12/price):'—',cf:fmt(cf),coc:equity>0?pct(cf*12/equity):'—'};
+    for(const k in vals){const el=$(`c${i}_${k}`);if(el){el.textContent=vals[k];if(k==='cf'||k==='coc')el.className=(cf>=0?'pos':'neg');}}
+  }
+}
+
+// LISTINGS
+let lsData=[
+  {desc:'רמת גן, ביאליק',price:2100000,sqm:75,rent:6200},
+  {desc:'בת ים, רוטשילד',price:1750000,sqm:68,rent:5800},
+];
+function parseListing(txt){
+  const clean=txt.replace(/[\u200e\u200f]/g,'');
+  const nums=s=>{const m=clean.match(s);return m?parseFloat(m[1].replace(/,/g,'')):null;};
+  let price=nums(/(?:מחיר|price)[^\d]{0,12}([\d,]{6,})/i);
+  if(!price){const m=clean.match(/([\d,]{6,})\s*(?:₪|ש"?ח|שח)/);if(m)price=parseFloat(m[1].replace(/,/g,''));}
+  if(!price){const all=[...clean.matchAll(/([\d,]{6,})/g)].map(x=>parseFloat(x[1].replace(/,/g,''))).filter(n=>n>=200000&&n<=100000000);if(all.length)price=Math.max(...all);}
+  const rooms=nums(/([\d]+(?:\.5)?)\s*(?:חדרים|חד'|חד׳|חדר)/);
+  let sqm=nums(/([\d]+(?:\.\d+)?)\s*(?:מ"ר|מ״ר|מטר|מ׳ר|sqm)/i);
+  if(!sqm)sqm=nums(/(?:שטח|גודל)[^\d]{0,8}([\d]+)/);
+  const floor=nums(/קומה\s*([\d]+)/);
+  const rent=nums(/(?:שכ"?ד|שכר דירה|שכירות)[^\d]{0,12}([\d,]{3,})/);
+  const firstLine=clean.split('\n').map(s=>s.trim()).filter(Boolean)[0]||'';
+  return {price,rooms,sqm,floor,rent,desc:firstLine.slice(0,40)};
+}
+function lsParams(){return{type:$('l_type').value,ltv:(+$('l_ltv').value||0)/100,rate:(+$('l_rate').value||0)/100,years:+$('l_years').value||0};}
+function renderLs(){
+  const tb=$('lsTable').querySelector('tbody');tb.innerHTML='';
+  lsData.forEach((d,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><input data-i="${i}" data-f="desc" value="${d.desc||''}" style="text-align:right"></td>`+
+      `<td><input type="number" data-i="${i}" data-f="price" value="${d.price||0}"></td>`+
+      `<td><input type="number" data-i="${i}" data-f="sqm" value="${d.sqm||0}"></td>`+
+      `<td><input type="number" data-i="${i}" data-f="rent" value="${d.rent||0}"></td>`+
+      `<td id="lc_ppm_${i}"></td><td id="lc_tax_${i}"></td><td id="lc_eq_${i}"></td><td id="lc_pmt_${i}"></td><td id="lc_cf_${i}"></td><td id="lc_y_${i}"></td>`+
+      `<td><button class="btn btn-r" data-del="${i}">✕</button></td>`;
+    tb.appendChild(tr);
+  });
+  tb.querySelectorAll('input').forEach(e=>e.addEventListener('input',ev=>{
+    const i=+ev.target.dataset.i,f=ev.target.dataset.f;
+    lsData[i][f]=f==='desc'?ev.target.value:(+ev.target.value||0);calcLs();
+  }));
+  tb.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{lsData.splice(+b.dataset.del,1);renderLs();});
+  calcLs();
+}
+function calcLs(){
+  const p=lsParams();let best=-1,bestY=-1;
+  lsData.forEach((d,i)=>{
+    const t=p.type==='invest'?tax(d.price,addBr):tax(d.price,singleBr);
+    const closing=t+d.price*0.02*1.18+d.price*0.005*1.18;
+    const equity=d.price*(1-p.ltv)+closing,mort=d.price*p.ltv;
+    const monthly=mort>0?pmt(p.rate,p.years*12,mort):0,cf=d.rent-monthly,y=d.price>0?d.rent*12/d.price:0;
+    const set=(k,v,cls)=>{const el=$(`lc_${k}_${i}`);if(el){el.textContent=v;if(cls)el.className=cls;}};
+    set('ppm',d.sqm>0?fmt(d.price/d.sqm):'—');set('tax',fmt(t));set('eq',fmt(equity));
+    set('pmt',fmt(monthly));set('cf',fmt(cf),cf>=0?'pos':'neg');set('y',pct(y));
+    if(y>bestY){bestY=y;best=i;}
+  });
+  $('lsTable').querySelectorAll('tbody tr').forEach((r,idx)=>{
+    r.querySelectorAll('td').forEach(td=>{if(!td.querySelector('input,button'))td.style.background=idx===best?'#dcfce7':'';});
+  });
+}
+$('parseBtn').onclick=()=>{
+  const txt=$('pasteBox').value.trim();
+  if(!txt){$('parseMsg').textContent='הדבק קודם טקסט מודעה.';return;}
+  const r=parseListing(txt);
+  if(!r.price){$('parseMsg').textContent='לא זוהה מחיר — הוסף ידנית.';}
+  else{$('parseMsg').textContent=`זוהה: מחיר ${fmt(r.price)}${r.sqm?', '+r.sqm+' מ"ר':''}${r.rooms?', '+r.rooms+' חד\'':''}`;}
+  lsData.push({desc:r.desc||'מודעה',price:r.price||0,sqm:r.sqm||0,rent:r.rent||0});
+  renderLs();$('pasteBox').value='';
+};
+$('emptyRow').onclick=()=>{lsData.push({desc:'',price:0,sqm:0,rent:0});renderLs();};
+document.querySelectorAll('#listings select,#l_ltv,#l_rate,#l_years').forEach(e=>e.addEventListener('input',calcLs));
+
+document.querySelectorAll('#calc input,#calc select,#sale input,#sale select').forEach(e=>e.addEventListener('input',calc));
+calc();buildCmp();renderLs();
+</script>
+</body>
+</html>

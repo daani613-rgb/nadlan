@@ -1,0 +1,19 @@
+[project]
+name = "realestate-toolkit"
+version = "0.1.0"
+description = "ערכת ניתוח השקעות נדל\"ן — ישראל 2026"
+requires-python = ">=3.10"
+dependencies = ["requests>=2.31", "openpyxl>=3.1"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
